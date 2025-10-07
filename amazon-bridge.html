@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abriendo Amazon…</title>
+  <script>
+    (function () {
+      // Parámetros:
+      //  ?u=URL_DE_AMAZON   (obligatorio)  ej: https://www.amazon.es/dp/B0XXXXX
+      //  &q=BUSQUEDA_GOOGLE (opcional)     ej: xiaomi redmi note 13
+      const params = new URLSearchParams(location.search);
+      const amazonUrl = params.get("u");
+      const q = params.get("q") || "Amazon ofertas";
+
+      // Si no nos dan URL de Amazon, vamos directo a Google.
+      if (!amazonUrl) {
+        location.replace("https://www.google.com/search?q=" + encodeURIComponent(q));
+        return;
+      }
+
+      // Intento 1: abrir la URL de Amazon (si está la app con enlaces universales, se abrirá).
+      const fallback = setTimeout(function () {
+        // Si no se abrió nada en ~1.5s, caemos a Google con la búsqueda.
+        const query = q || amazonUrl;
+        location.replace("https://www.google.com/search?q=" + encodeURIComponent(query));
+      }, 1500);
+
+      // En algunos navegadores, si sí abre Amazon, la página pierde visibilidad: cancelamos fallback.
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "hidden") clearTimeout(fallback);
+      });
+
+      // Dispara la navegación a Amazon.
+      window.location.href = amazonUrl;
+    })();
+  </script>
+  <style>body{font-family:system-ui,Arial;margin:40px}h1{font-size:20px}</style>
+</head>
+<body>
+  <h1>Abriendo Amazon…</h1>
+  <p>Si no se abre, te redirigiremos automáticamente.</p>
+</body>
+</html>
