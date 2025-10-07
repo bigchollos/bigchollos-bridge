@@ -1,49 +1,41 @@
-[0:37, 8/10/2025] Nas: amazon_url = f"https://www.{domain}/dp/{asin}?{urlencode(params)}"
-    bridge_url = f"https://bigchollos.github.io/bigchollos-bridge/amazon-bridge.html?url={amazon_url}"
-    return bridge_url
-[0:45, 8/10/2025] Nas: amazon_url = f"https://www.{domain}/dp/{asin}?{urlencode(params)}"
-bridge_url = f"https://bigchollos.github.io/bigchollos-bridge/amazon-bridge.html?url={quote_plus(amazon_url)}"
-return bridge_url
-[0:55, 8/10/2025] Nas: <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Abrir en Amazon</title>
+  <style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:16px}</style>
   <script>
     function getTargetUrl() {
       const params = new URLSearchParams(window.location.search);
       const raw = params.get("url");
       if (!raw) return null;
-      // El bot envía la URL codificada con quote_plus: convertimos + -> %20 y decodificamos
-      try {
-        return decodeURIComponent(raw.replace(/\+/g, "%20"));
-      } catch (e) {
-        return null;
-      }
+      try { return decodeURIComponent(raw.replace(/\+/g, "%20")); }
+      catch { return null; }
     }
-
     window.onload = function () {
       const target = getTargetUrl();
-      if (!target) {
-        document.body.innerText = "Falta el parámetro 'url'.";
-        return;
-      }
+      const info = document.getElementById("info");
+      const a = document.getElementById("fallback");
 
-      // Intentar abrir la app de Amazon con el mismo path
+      if (!target) { info.textContent = "Falta el parámetro ?url=..."; return; }
+
+      // mostrar destino para comprobarlo y dar enlace manual
+      info.textContent = "Destino decodificado: " + target;
+      a.href = target;
+
+      // Intento app primero
       const appLink = target.replace(/^https?:\/\//i, "amazon://");
-
-      // 1) Probar abrir la app
       window.location.href = appLink;
 
-      // 2) Si no hay app, tras 1 segundo abrir la web normal
-      setTimeout(function () {
-        window.location.href = target;
-      }, 1000);
+      // Si no hay app, abrir web en 1000 ms
+      setTimeout(function () { window.location.href = target; }, 1000);
     };
   </script>
 </head>
 <body>
-  <p>Redirigiendo a Amazon…</p>
+  <h3>Redirigiendo a Amazon…</h3>
+  <p id="info">Preparando…</p>
+  <p><a id="fallback" href="#" rel="nofollow">Si no redirige, toca aquí para abrir Amazon</a></p>
 </body>
 </html>
