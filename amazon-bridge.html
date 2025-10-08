@@ -1,53 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirigiendo a Amazon...</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #fff; }
-    a { color: #1a0dab; text-decoration: none; }
-  </style>
+  <meta charset="utf-8">
+  <title>...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>
-    function getTargetUrl() {
-      const p = new URLSearchParams(window.location.search);
-      const raw = p.get("url");
-      if (!raw) return null;
-      try { return decodeURIComponent(raw.replace(/\+/g, "%20")); } catch { return null; }
-    }
-
-    function hardRedirect(url) {
-      window.location.replace(url);
-      setTimeout(() => { window.open(url, "_self"); }, 400);
-      setTimeout(() => {
-        const a = document.createElement("a");
-        a.href = url; a.rel = "nofollow"; a.target = "_self";
-        document.body.appendChild(a); a.click();
-      }, 800);
-    }
-
-    window.onload = function () {
-      const target = getTargetUrl();
-      const info = document.getElementById("info");
-      const a = document.getElementById("fallback");
-
-      if (!target) { info.textContent = "Falta el parámetro ?url=..."; return; }
-
-      info.textContent = "Destino decodificado: " + target;
-      a.href = target;
-
-      const appLink = target.replace(/^https?:\/\//i, "amazon://");
-      window.location.href = appLink;
-
-      setTimeout(() => hardRedirect(target), 600);
-    };
+    (function () {
+      try {
+        const p = new URLSearchParams(location.search);
+        const destino = p.get("url");
+        if (destino) {
+          // Redirección limpia (sin volver a la página intermedia)
+          window.location.replace(destino);
+        } else {
+          // Si no hay parámetro, te llevo a Amazon.es
+          window.location.replace("https://www.amazon.es/");
+        }
+      } catch (e) {
+        window.location.href = "https://www.amazon.es/";
+      }
+    })();
   </script>
 </head>
-<body>
-  <h3>Redirigiendo a Amazon…</h3>
-  <p id="info"></p>
-  <p><a id="fallback" href="#">Si no redirige, toca aquí para abrir Amazon</a></p>
-</body>
+<body></body>
 </html>
 
   
+
